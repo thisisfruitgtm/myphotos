@@ -34,8 +34,8 @@ export async function generateRegistrationOptionsForUser(userId: string, userNam
       authenticatorAttachment: 'platform',
     },
     excludeCredentials: user.passkeys.map((passkey) => ({
-      id: Buffer.from(passkey.credentialId, 'base64'),
-      type: 'public-key',
+      id: passkey.credentialId,
+      transports: ['internal' as const],
     })),
   });
 
@@ -85,8 +85,8 @@ export async function generateAuthenticationOptionsForUser(username?: string) {
 
     if (user && user.passkeys.length > 0) {
       allowCredentials = user.passkeys.map((passkey) => ({
-        id: Buffer.from(passkey.credentialId, 'base64'),
-        type: 'public-key' as const,
+        id: passkey.credentialId,
+        transports: ['internal' as const],
       }));
     }
   }
@@ -121,8 +121,8 @@ export async function verifyAuthentication(
     expectedOrigin: origin,
     expectedRPID: rpID,
     authenticator: {
-      credentialID: Buffer.from(passkey.credentialId, 'base64'),
-      credentialPublicKey: Buffer.from(passkey.publicKey, 'base64'),
+      credentialID: passkey.credentialId,
+      credentialPublicKey: new Uint8Array(Buffer.from(passkey.publicKey, 'base64')),
       counter: passkey.counter,
     },
   });
