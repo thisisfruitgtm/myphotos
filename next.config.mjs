@@ -7,6 +7,7 @@ const nextConfig = {
         hostname: '**',
       },
     ],
+    unoptimized: process.env.NODE_ENV === 'production', // Disable optimization in production for uploaded images
   },
   poweredByHeader: false,
   output: 'standalone',
