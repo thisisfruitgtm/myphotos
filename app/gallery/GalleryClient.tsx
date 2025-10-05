@@ -123,7 +123,7 @@ export default function GalleryClient({
             >
               <div className="relative aspect-square">
                 <Image
-                  src={`/uploads/${photo.filename}`}
+                  src={`/api/uploads/${photo.filename}`}
                   alt={photo.title}
                   fill
                   className="object-cover"
@@ -162,7 +162,7 @@ export default function GalleryClient({
               <div className="space-y-4">
                 <div className="relative w-full aspect-video">
                   <Image
-                    src={`/uploads/${selectedPhoto.filename}`}
+                    src={`/api/uploads/${selectedPhoto.filename}`}
                     alt={selectedPhoto.title}
                     fill
                     className="object-contain"
