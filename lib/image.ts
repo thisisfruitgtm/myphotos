@@ -25,28 +25,31 @@ export async function processImage(
   originalName: string
 ): Promise<{ filename: string; metadata: ImageMetadata }> {
   const ext = path.extname(originalName).toLowerCase();
-  const filename = `${crypto.randomBytes(16).toString('hex')}${ext}`;
+  const filename = `${crypto.randomBytes(16).toString('hex')}.jpg`; // Always save as jpg after processing
   const uploadDir = path.join(process.cwd(), 'public', 'uploads');
   const filepath = path.join(uploadDir, filename);
 
   // Ensure upload directory exists
   await mkdir(uploadDir, { recursive: true });
 
-  // Extract EXIF data before compression
+  // Extract EXIF data BEFORE any processing
   let exifData: any = {};
   try {
-    const parser = exifParser.create(buffer);
-    const result = parser.parse();
-    exifData = result.tags;
+    // Only try to parse EXIF from JPEG files
+    if (ext === '.jpg' || ext === '.jpeg') {
+      const parser = exifParser.create(buffer);
+      const result = parser.parse();
+      exifData = result.tags;
+    }
   } catch (error) {
-    console.log('No EXIF data found or error parsing:', error);
+    // Silently fail - not all images have EXIF data
+    console.log('No EXIF data available');
   }
 
   // Process image with sharp - compress but keep sharp
   const processed = await sharp(buffer)
     .rotate() // Auto-rotate based on EXIF orientation
-    .withMetadata() // Preserve metadata
-    .jpeg({ quality: 85, mozjpeg: true }) // High quality compression
+    .jpeg({ quality: 85, mozjpeg: true }) // High quality compression, convert to JPEG
     .toBuffer();
 
   await writeFile(filepath, processed);
