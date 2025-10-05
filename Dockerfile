@@ -41,6 +41,9 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 RUN mkdir -p public/uploads
 RUN chown -R nextjs:nodejs public/uploads
 
+# Declare uploads as a volume for persistence
+VOLUME ["/app/public/uploads"]
+
 USER nextjs
 
 EXPOSE 3000
