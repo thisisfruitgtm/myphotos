@@ -37,9 +37,12 @@ export async function POST(request: NextRequest) {
     const token = await createSession(user.id);
     
     const cookieStore = await cookies();
+    // Only use secure cookies if the app is running on HTTPS
+    const isHttps = request.url.startsWith('https://');
+    
     cookieStore.set('session', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isHttps,
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
