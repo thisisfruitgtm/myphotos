@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  photos    Photo[]
+  categories Category[]
+  passkeys  Passkey[]
+  sessions  Session[] @relation("UserSessions")
+}
+
+model Passkey {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialId    String   @unique
+  publicKey       String
+  counter         Int
+  deviceName      String?
+  createdAt       DateTime @default(now())
+  lastUsedAt      DateTime @default(now())
+  
+  @@index([userId])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  password    String?  // Hashed password for protected categories
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos      Photo[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Photo {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int
+  width       Int
+  height      Int
+  password    String?  // Hashed password for protected photos
+  
+  // EXIF data
+  latitude    Float?
+  longitude   Float?
+  location    String?  // Human-readable location if available
+  dateTaken   DateTime?
+  camera      String?
+  lens        String?
+  focalLength String?
+  aperture    String?
+  shutterSpeed String?
+  iso         String?
+  
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([categoryId])
+  @@index([userId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("UserSessions", fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+}
