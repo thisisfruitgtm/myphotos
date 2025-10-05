@@ -58,8 +58,8 @@ export default function LoginPage() {
       }
 
       console.log('Login successful, redirecting to admin...');
-      router.push('/admin');
-      router.refresh();
+      // Use window.location for full page reload to ensure cookie is available
+      window.location.href = '/admin';
     } catch (err) {
       console.error('Login error:', err);
       setError('Something went wrong: ' + (err instanceof Error ? err.message : 'Unknown error'));
@@ -104,8 +104,8 @@ export default function LoginPage() {
         return;
       }
 
-      router.push('/admin');
-      router.refresh();
+      // Use window.location for full page reload to ensure cookie is available
+      window.location.href = '/admin';
     } catch (err: any) {
       console.error('Biometric login error:', err);
       if (err.name === 'NotAllowedError') {
