@@ -44,22 +44,27 @@ export default function LoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
+        credentials: 'include', // Important for cookies!
       });
 
       console.log('Login response status:', res.status);
 
-      const data = await res.json();
-      console.log('Login response data:', data);
-
       if (!res.ok) {
+        const data = await res.json();
+        console.log('Login failed:', data);
         setError(data.error || 'Login failed');
         setLoading(false);
         return;
       }
 
+      const data = await res.json();
+      console.log('Login response data:', data);
       console.log('Login successful, redirecting to admin...');
-      // Use window.location for full page reload to ensure cookie is available
-      window.location.href = '/admin';
+      
+      // Small delay to ensure cookie is set
+      setTimeout(() => {
+        window.location.href = '/admin';
+      }, 100);
     } catch (err) {
       console.error('Login error:', err);
       setError('Something went wrong: ' + (err instanceof Error ? err.message : 'Unknown error'));
