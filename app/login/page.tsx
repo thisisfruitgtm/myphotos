@@ -38,24 +38,31 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      console.log('Attempting login for username:', username);
+      
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
+      console.log('Login response status:', res.status);
+
       const data = await res.json();
+      console.log('Login response data:', data);
 
       if (!res.ok) {
         setError(data.error || 'Login failed');
+        setLoading(false);
         return;
       }
 
+      console.log('Login successful, redirecting to admin...');
       router.push('/admin');
       router.refresh();
     } catch (err) {
-      setError('Something went wrong');
-    } finally {
+      console.error('Login error:', err);
+      setError('Something went wrong: ' + (err instanceof Error ? err.message : 'Unknown error'));
       setLoading(false);
     }
   }
