@@ -38,7 +38,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    // Generate base slug
+    let slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    
+    // Check if slug exists and make it unique
+    const existingCategory = await prisma.category.findUnique({
+      where: { slug },
+    });
+    
+    if (existingCategory) {
+      // Add timestamp to make it unique
+      slug = `${slug}-${Date.now()}`;
+    }
 
     const hashedPassword = password ? await hashPassword(password) : null;
 
