@@ -4,10 +4,10 @@ import path from 'path';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { filename: string } }
+  { params }: { params: Promise<{ filename: string }> }
 ) {
   try {
-    const { filename } = params;
+    const { filename } = await params;
     
     // Security: only allow alphanumeric and hyphens
     if (!/^[a-z0-9-]+\.jpg$/i.test(filename)) {
