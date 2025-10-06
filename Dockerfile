@@ -45,16 +45,17 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
 # Copy public directory for static files
-COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Copy Prisma files for runtime
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
-# Create uploads directory
-RUN mkdir -p public/uploads
-RUN chown -R nextjs:nodejs public/uploads
+# Create uploads directory with correct ownership BEFORE switching user
+RUN mkdir -p public/uploads && \
+    chown -R nextjs:nodejs public && \
+    chmod -R 755 public/uploads
 
 # Declare uploads as a volume for persistence
 VOLUME ["/app/public/uploads"]
