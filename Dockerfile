@@ -5,21 +5,29 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
+# Copy only dependency files first for better caching
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma
-RUN npm ci
+
+# Use cache mount for npm to speed up installs
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/prisma ./prisma
+
+# Copy source files
 COPY . .
 
-# Generate Prisma Client
+# Generate Prisma Client (uses cached if schema unchanged)
 RUN npx prisma generate
 
-# Build Next.js
-RUN npm run build
+# Build Next.js with cache mount for faster rebuilds
+RUN --mount=type=cache,target=/app/.next/cache \
+    npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -55,7 +63,7 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]
