@@ -14,7 +14,12 @@ export async function GET(
       return new NextResponse('Invalid filename', { status: 400 });
     }
 
-    const filepath = path.join(process.cwd(), 'public', 'uploads', filename);
+    // In standalone build, use absolute path to /app/public
+    const publicPath = process.env.NODE_ENV === 'production' 
+      ? '/app/public'
+      : path.join(process.cwd(), 'public');
+    
+    const filepath = path.join(publicPath, 'uploads', filename);
     const fileBuffer = await readFile(filepath);
 
     // Convert Buffer to Uint8Array for Next.js 15 compatibility
