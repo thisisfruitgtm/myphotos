@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Modern photographer portfolio web app with authentication and category management",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
