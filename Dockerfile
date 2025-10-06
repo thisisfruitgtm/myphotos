@@ -29,10 +29,16 @@ ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy necessary files
-COPY --from=builder /app/public ./public
+# Copy standalone output (includes server.js, node_modules, etc)
 COPY --from=builder /app/.next/standalone ./
+
+# Copy static assets for Next.js
 COPY --from=builder /app/.next/static ./.next/static
+
+# Copy public directory for static files
+COPY --from=builder /app/public ./public
+
+# Copy Prisma files for runtime
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
