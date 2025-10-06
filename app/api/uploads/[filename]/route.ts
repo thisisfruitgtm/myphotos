@@ -17,13 +17,10 @@ export async function GET(
     const filepath = path.join(process.cwd(), 'public', 'uploads', filename);
     const fileBuffer = await readFile(filepath);
 
-    // Convert Buffer to ArrayBuffer for Next.js 15 compatibility
-    const arrayBuffer = fileBuffer.buffer.slice(
-      fileBuffer.byteOffset,
-      fileBuffer.byteOffset + fileBuffer.byteLength
-    );
+    // Convert Buffer to Uint8Array for Next.js 15 compatibility
+    const uint8Array = new Uint8Array(fileBuffer);
 
-    return new NextResponse(arrayBuffer, {
+    return new NextResponse(uint8Array, {
       headers: {
         'Content-Type': 'image/jpeg',
         'Cache-Control': 'public, max-age=31536000, immutable',
